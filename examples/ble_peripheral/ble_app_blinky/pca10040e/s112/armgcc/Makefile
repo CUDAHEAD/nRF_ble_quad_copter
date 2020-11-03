@@ -2,6 +2,7 @@ PROJECT_NAME     := ble_app_blinky_pca10040e_s112
 TARGETS          := nrf52810_xxaa
 OUTPUT_DIRECTORY := _build
 
+
 SDK_ROOT := ../../../../../..
 PROJ_DIR := ../../..
 
