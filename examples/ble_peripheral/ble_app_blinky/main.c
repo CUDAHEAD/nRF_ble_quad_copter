@@ -109,6 +109,7 @@ static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;                   
 static uint8_t m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];                    /**< Buffer for storing an encoded advertising set. */
 static uint8_t m_enc_scan_response_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX];         /**< Buffer for storing an encoded scan data. */
 static nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
+static uint16_t 				   m_pwm_value = 0x2600 ; 
 
 static uint8_t m_used = 0;
 #define USED_PWM(idx) (1UL << idx)
@@ -277,11 +278,13 @@ static void led_write_handler(uint16_t conn_handle, ble_lbs_t * p_lbs, uint8_t l
 {
     if (led_state)
     {
+		m_pwm_value = 0x100;
         bsp_board_led_on(LEDBUTTON_LED);
         NRF_LOG_INFO("Received LED ON!");
     }
     else
     {
+		m_pwm_value = 0x2600;
         bsp_board_led_off(LEDBUTTON_LED);
         NRF_LOG_INFO("Received LED OFF!");
     }
@@ -566,9 +569,8 @@ static void idle_state_handle(void)
 }
 
 
-
 static uint16_t const              m_demo1_top  = 10000;
-static uint16_t const              m_demo1_step = 200;
+//static uint16_t const              m_demo1_step = 200;
 static uint8_t                     m_demo1_phase;
 static nrf_pwm_values_individual_t m_demo1_seq_values;
 static nrf_pwm_sequence_t const    m_demo1_seq =
@@ -584,13 +586,13 @@ static void demo1_handler(nrf_drv_pwm_evt_type_t event_type)
 {
     if (event_type == NRF_DRV_PWM_EVT_FINISHED)
     {
-        uint8_t channel    = m_demo1_phase >> 1;
-        bool    down       = m_demo1_phase & 1;
-        bool    next_phase = false;
+        uint8_t channel    = 0;//m_demo1_phase >> 1;
+        //bool    down       = 0;//m_demo1_phase & 1;
+        //bool    next_phase = false;
 
         uint16_t * p_channels = (uint16_t *)&m_demo1_seq_values;
-        uint16_t value = p_channels[channel];
-        if (down)
+        //uint16_t value = p_channels[channel];
+        /*if (down)
         {
             value -= m_demo1_step;
             if (value == 0)
@@ -605,16 +607,18 @@ static void demo1_handler(nrf_drv_pwm_evt_type_t event_type)
             {
                 next_phase = true;
             }
-        }
-        p_channels[channel] = value;
+        }*/
+        //p_channels[channel] = value;
+        //p_channels[channel] = 0x2600; //weak light
+        p_channels[channel] = m_pwm_value;
 
-        if (next_phase)
+        /*if (next_phase)
         {
             if (++m_demo1_phase >= 2 * NRF_PWM_CHANNEL_COUNT)
             {
                 m_demo1_phase = 0;
             }
-        }
+        }*/
     }
 }
 
