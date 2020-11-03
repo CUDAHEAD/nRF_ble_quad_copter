@@ -67,7 +67,9 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
-
+#include "nrf_drv_pwm.h"
+#include "nrfx_pwm.h"
+#include "nrf_pwm.h"
 
 #define ADVERTISING_LED                 BSP_BOARD_LED_0                         /**< Is on when device is advertising. */
 #define CONNECTED_LED                   BSP_BOARD_LED_1                         /**< Is on when device has connected. */
@@ -106,6 +108,10 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        
 static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;                   /**< Advertising handle used to identify an advertising set. */
 static uint8_t m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];                    /**< Buffer for storing an encoded advertising set. */
 static uint8_t m_enc_scan_response_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX];         /**< Buffer for storing an encoded scan data. */
+static nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
+
+static uint8_t m_used = 0;
+#define USED_PWM(idx) (1UL << idx)
 
 /**@brief Struct that contains pointers to the encoded advertising data. */
 static ble_gap_adv_data_t m_adv_data =
@@ -560,6 +566,96 @@ static void idle_state_handle(void)
 }
 
 
+
+static uint16_t const              m_demo1_top  = 10000;
+static uint16_t const              m_demo1_step = 200;
+static uint8_t                     m_demo1_phase;
+static nrf_pwm_values_individual_t m_demo1_seq_values;
+static nrf_pwm_sequence_t const    m_demo1_seq =
+{
+    .values.p_individual = &m_demo1_seq_values,
+    .length              = NRF_PWM_VALUES_LENGTH(m_demo1_seq_values),
+    .repeats             = 0,
+    .end_delay           = 0
+};
+
+
+static void demo1_handler(nrf_drv_pwm_evt_type_t event_type)
+{
+    if (event_type == NRF_DRV_PWM_EVT_FINISHED)
+    {
+        uint8_t channel    = m_demo1_phase >> 1;
+        bool    down       = m_demo1_phase & 1;
+        bool    next_phase = false;
+
+        uint16_t * p_channels = (uint16_t *)&m_demo1_seq_values;
+        uint16_t value = p_channels[channel];
+        if (down)
+        {
+            value -= m_demo1_step;
+            if (value == 0)
+            {
+                next_phase = true;
+            }
+        }
+        else
+        {
+            value += m_demo1_step;
+            if (value >= m_demo1_top)
+            {
+                next_phase = true;
+            }
+        }
+        p_channels[channel] = value;
+
+        if (next_phase)
+        {
+            if (++m_demo1_phase >= 2 * NRF_PWM_CHANNEL_COUNT)
+            {
+                m_demo1_phase = 0;
+            }
+        }
+    }
+}
+
+
+
+static void demo1(void)
+{
+    NRF_LOG_INFO("Demo 1");
+
+    /*
+     * This demo plays back a sequence with different values for individual
+     * channels (LED 1 - LED 4). Only four values are used (one per channel).
+     * Every time the values are loaded into the compare registers, they are
+     * updated in the provided event handler. The values are updated in such
+     * a way that increase and decrease of the light intensity can be observed
+     * continuously on succeeding channels (one second per channel).
+     */
+
+    nrf_drv_pwm_config_t const config0 =
+    {
+        .output_pins =
+        {
+            BSP_LED_0 | NRF_DRV_PWM_PIN_INVERTED // channel 0
+        },
+        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
+        .base_clock   = NRF_PWM_CLK_1MHz,
+        .count_mode   = NRF_PWM_MODE_UP,
+        .top_value    = m_demo1_top,
+        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
+        .step_mode    = NRF_PWM_STEP_AUTO
+    };
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, demo1_handler));
+    m_used |= USED_PWM(0);
+
+    m_demo1_seq_values.channel_0 = 0;
+    m_demo1_phase                = 0;
+
+    (void)nrf_drv_pwm_simple_playback(&m_pwm0, &m_demo1_seq, 1,
+                                      NRF_DRV_PWM_FLAG_LOOP);
+}
+
 /**@brief Function for application main entry.
  */
 int main(void)
@@ -580,6 +676,8 @@ int main(void)
     // Start execution.
     NRF_LOG_INFO("Blinky example started.");
     advertising_start();
+
+	demo1();
 
     // Enter main loop.
     for (;;)

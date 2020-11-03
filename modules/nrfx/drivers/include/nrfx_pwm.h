@@ -64,15 +64,8 @@ typedef struct
     uint8_t        drv_inst_idx; ///< Driver instance index.
 } nrfx_pwm_t;
 
-/**
- * @brief Macro for creating a PWM driver instance.
- */
-#define NRFX_PWM_INSTANCE(id)                               \
-{                                                           \
-    .p_registers  = NRFX_CONCAT_2(NRF_PWM, id),             \
-    .drv_inst_idx = NRFX_CONCAT_3(NRFX_PWM, id, _INST_IDX), \
-}
-
+#undef NRFX_PWM0_ENABLED
+#define NRFX_PWM0_ENABLED 1
 enum {
 #if NRFX_CHECK(NRFX_PWM0_ENABLED)
     NRFX_PWM0_INST_IDX,
@@ -90,6 +83,14 @@ enum {
 };
 
 /**
+ * @brief Macro for creating a PWM driver instance.
+ */
+#define NRFX_PWM_INSTANCE(id)                               \
+{                                                           \
+    .p_registers  = NRFX_CONCAT_2(NRF_PWM, id),             \
+    .drv_inst_idx = NRFX_CONCAT_3(NRFX_PWM, id, _INST_IDX), \
+}
+	/**
  * @brief This value can be provided instead of a pin number for any channel
  *        to specify that its output is not used and therefore does not need
  *        to be connected to a pin.
