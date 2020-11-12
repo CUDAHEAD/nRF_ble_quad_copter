@@ -170,8 +170,8 @@ extern "C" {
 
 
 // Arduino board mappings
-#define ARDUINO_SCL_PIN             6//27    // SCL signal pin
-#define ARDUINO_SDA_PIN             4//26    // SDA signal pin
+#define ARDUINO_SCL_PIN             10 //- wokring option//27    // SCL signal pin
+#define ARDUINO_SDA_PIN             9 //- working//7//26    // SDA signal pin
 #define ARDUINO_AREF_PIN            2     // Aref pin
 #define ARDUINO_13_PIN              25    // Digital pin 13
 #define ARDUINO_12_PIN              24    // Digital pin 12
