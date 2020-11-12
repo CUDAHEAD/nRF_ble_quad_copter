@@ -4623,8 +4623,12 @@
 // <e> TWI_ENABLED - nrf_drv_twi - TWI/TWIM peripheral driver - legacy layer
 //==========================================================
 #ifndef TWI_ENABLED
-#define TWI_ENABLED 0
+#define TWI_ENABLED 1
 #endif
+
+#define TWI0_ENABLED 1
+
+
 // <o> TWI_DEFAULT_CONFIG_FREQUENCY  - Frequency
  
 // <26738688=> 100k 
@@ -6114,100 +6118,6 @@
 
 #ifndef BUTTON_HIGH_ACCURACY_ENABLED
 #define BUTTON_HIGH_ACCURACY_ENABLED 0
-#endif
-
-// </h> 
-//==========================================================
-
-// <h> nrf_cli - Command line interface
-
-//==========================================================
-// <q> NRF_CLI_ENABLED  - Enable/disable the CLI module.
- 
-
-#ifndef NRF_CLI_ENABLED
-#define NRF_CLI_ENABLED 0
-#endif
-
-// <o> NRF_CLI_ARGC_MAX - Maximum number of parameters passed to the command handler. 
-#ifndef NRF_CLI_ARGC_MAX
-#define NRF_CLI_ARGC_MAX 12
-#endif
-
-// <q> NRF_CLI_BUILD_IN_CMDS_ENABLED  - CLI built-in commands.
- 
-
-#ifndef NRF_CLI_BUILD_IN_CMDS_ENABLED
-#define NRF_CLI_BUILD_IN_CMDS_ENABLED 1
-#endif
-
-// <o> NRF_CLI_CMD_BUFF_SIZE - Maximum buffer size for a single command. 
-#ifndef NRF_CLI_CMD_BUFF_SIZE
-#define NRF_CLI_CMD_BUFF_SIZE 128
-#endif
-
-// <q> NRF_CLI_ECHO_STATUS  - CLI echo status. If set, echo is ON.
- 
-
-#ifndef NRF_CLI_ECHO_STATUS
-#define NRF_CLI_ECHO_STATUS 1
-#endif
-
-// <q> NRF_CLI_WILDCARD_ENABLED  - Enable wildcard functionality for CLI commands.
- 
-
-#ifndef NRF_CLI_WILDCARD_ENABLED
-#define NRF_CLI_WILDCARD_ENABLED 0
-#endif
-
-// <o> NRF_CLI_PRINTF_BUFF_SIZE - Maximum print buffer size. 
-#ifndef NRF_CLI_PRINTF_BUFF_SIZE
-#define NRF_CLI_PRINTF_BUFF_SIZE 23
-#endif
-
-// <e> NRF_CLI_HISTORY_ENABLED - Enable CLI history mode.
-//==========================================================
-#ifndef NRF_CLI_HISTORY_ENABLED
-#define NRF_CLI_HISTORY_ENABLED 1
-#endif
-// <o> NRF_CLI_HISTORY_ELEMENT_SIZE - Size of one memory object reserved for CLI history. 
-#ifndef NRF_CLI_HISTORY_ELEMENT_SIZE
-#define NRF_CLI_HISTORY_ELEMENT_SIZE 32
-#endif
-
-// <o> NRF_CLI_HISTORY_ELEMENT_COUNT - Number of history memory objects. 
-#ifndef NRF_CLI_HISTORY_ELEMENT_COUNT
-#define NRF_CLI_HISTORY_ELEMENT_COUNT 8
-#endif
-
-// </e>
-
-// <q> NRF_CLI_VT100_COLORS_ENABLED  - CLI VT100 colors.
- 
-
-#ifndef NRF_CLI_VT100_COLORS_ENABLED
-#define NRF_CLI_VT100_COLORS_ENABLED 1
-#endif
-
-// <q> NRF_CLI_STATISTICS_ENABLED  - Enable CLI statistics.
- 
-
-#ifndef NRF_CLI_STATISTICS_ENABLED
-#define NRF_CLI_STATISTICS_ENABLED 1
-#endif
-
-// <q> NRF_CLI_LOG_BACKEND  - Enable logger backend interface.
- 
-
-#ifndef NRF_CLI_LOG_BACKEND
-#define NRF_CLI_LOG_BACKEND 1
-#endif
-
-// <q> NRF_CLI_USES_TASK_MANAGER_ENABLED  - Enable CLI to use task_manager
- 
-
-#ifndef NRF_CLI_USES_TASK_MANAGER_ENABLED
-#define NRF_CLI_USES_TASK_MANAGER_ENABLED 0
 #endif
 
 // </h> 
