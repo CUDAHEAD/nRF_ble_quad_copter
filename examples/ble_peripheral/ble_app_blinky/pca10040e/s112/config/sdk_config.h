@@ -4754,133 +4754,16 @@
 #ifndef UART0_ENABLED
 #define UART0_ENABLED 1
 #endif
-// </e>
-
-// </e>
-
-// <e> USBD_ENABLED - nrf_drv_usbd - USB driver
-//==========================================================
-#ifndef USBD_ENABLED
-#define USBD_ENABLED 0
-#endif
-// <o> USBD_CONFIG_IRQ_PRIORITY  - Interrupt priority
+// <q> UART0_CONFIG_USE_EASY_DMA  - Default setting for using EasyDMA
  
 
-// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef USBD_CONFIG_IRQ_PRIORITY
-#define USBD_CONFIG_IRQ_PRIORITY 7
-#endif
-
-// <o> USBD_CONFIG_DMASCHEDULER_MODE  - USBD SMA scheduler working scheme
- 
-// <0=> Prioritized access 
-// <1=> Round Robin 
-
-#ifndef USBD_CONFIG_DMASCHEDULER_MODE
-#define USBD_CONFIG_DMASCHEDULER_MODE 0
+#ifndef UART0_CONFIG_USE_EASY_DMA
+#define UART0_CONFIG_USE_EASY_DMA 1
 #endif
 
 // </e>
 
-// <e> WDT_ENABLED - nrf_drv_wdt - WDT peripheral driver - legacy layer
-//==========================================================
-#ifndef WDT_ENABLED
-#define WDT_ENABLED 0
-#endif
-// <o> WDT_CONFIG_BEHAVIOUR  - WDT behavior in CPU SLEEP or HALT mode
- 
-// <1=> Run in SLEEP, Pause in HALT 
-// <8=> Pause in SLEEP, Run in HALT 
-// <9=> Run in SLEEP and HALT 
-// <0=> Pause in SLEEP and HALT 
-
-#ifndef WDT_CONFIG_BEHAVIOUR
-#define WDT_CONFIG_BEHAVIOUR 1
-#endif
-
-// <o> WDT_CONFIG_RELOAD_VALUE - Reload value  <15-4294967295> 
-
-
-#ifndef WDT_CONFIG_RELOAD_VALUE
-#define WDT_CONFIG_RELOAD_VALUE 2000
-#endif
-
-// <o> WDT_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
-
-// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef WDT_CONFIG_IRQ_PRIORITY
-#define WDT_CONFIG_IRQ_PRIORITY 7
-#endif
-
 // </e>
-
-// <h> nrfx_i2s - I2S peripheral driver
-
-//==========================================================
-// </h> 
-//==========================================================
-
-// <h> nrfx_lpcomp - LPCOMP peripheral driver
-
-//==========================================================
-// </h> 
-//==========================================================
-
-// <h> nrfx_qspi - QSPI peripheral driver
-
-//==========================================================
-// </h> 
-//==========================================================
-
-// <h> nrfx_spi - SPI peripheral driver
-
-//==========================================================
-// </h> 
-//==========================================================
-
-// <h> nrfx_twi - TWI peripheral driver
-
-//==========================================================
-// </h> 
-//==========================================================
-
-// <h> nrfx_uart - UART peripheral driver
-
-//==========================================================
-// </h> 
-//==========================================================
-
-// </h> 
-//==========================================================
-
-// <h> nRF_Drivers_External 
-
-//==========================================================
-// <q> NRF_TWI_SENSOR_ENABLED  - nrf_twi_sensor - nRF TWI Sensor module
- 
-
-#ifndef NRF_TWI_SENSOR_ENABLED
-#define NRF_TWI_SENSOR_ENABLED 0
-#endif
 
 // </h> 
 //==========================================================
@@ -4888,20 +4771,6 @@
 // <h> nRF_Libraries 
 
 //==========================================================
-// <q> APP_GPIOTE_ENABLED  - app_gpiote - GPIOTE events dispatcher
- 
-
-#ifndef APP_GPIOTE_ENABLED
-#define APP_GPIOTE_ENABLED 0
-#endif
-
-// <q> APP_PWM_ENABLED  - app_pwm - PWM functionality
- 
-
-#ifndef APP_PWM_ENABLED
-#define APP_PWM_ENABLED 0
-#endif
-
 // <e> APP_SCHEDULER_ENABLED - app_scheduler - Events scheduler
 //==========================================================
 #ifndef APP_SCHEDULER_ENABLED
@@ -4919,51 +4788,6 @@
 
 #ifndef APP_SCHEDULER_WITH_PROFILER
 #define APP_SCHEDULER_WITH_PROFILER 0
-#endif
-
-// </e>
-
-// <e> APP_SDCARD_ENABLED - app_sdcard - SD/MMC card support using SPI
-//==========================================================
-#ifndef APP_SDCARD_ENABLED
-#define APP_SDCARD_ENABLED 0
-#endif
-// <o> APP_SDCARD_SPI_INSTANCE  - SPI instance used
- 
-// <0=> 0 
-// <1=> 1 
-// <2=> 2 
-
-#ifndef APP_SDCARD_SPI_INSTANCE
-#define APP_SDCARD_SPI_INSTANCE 0
-#endif
-
-// <o> APP_SDCARD_FREQ_INIT  - SPI frequency
- 
-// <33554432=> 125 kHz 
-// <67108864=> 250 kHz 
-// <134217728=> 500 kHz 
-// <268435456=> 1 MHz 
-// <536870912=> 2 MHz 
-// <1073741824=> 4 MHz 
-// <2147483648=> 8 MHz 
-
-#ifndef APP_SDCARD_FREQ_INIT
-#define APP_SDCARD_FREQ_INIT 67108864
-#endif
-
-// <o> APP_SDCARD_FREQ_DATA  - SPI frequency
- 
-// <33554432=> 125 kHz 
-// <67108864=> 250 kHz 
-// <134217728=> 500 kHz 
-// <268435456=> 1 MHz 
-// <536870912=> 2 MHz 
-// <1073741824=> 4 MHz 
-// <2147483648=> 8 MHz 
-
-#ifndef APP_SDCARD_FREQ_DATA
-#define APP_SDCARD_FREQ_DATA 1073741824
 #endif
 
 // </e>
@@ -5124,149 +4948,11 @@
 
 // </e>
 
-// <e> NRF_CSENSE_ENABLED - nrf_csense - Capacitive sensor module
-//==========================================================
-#ifndef NRF_CSENSE_ENABLED
-#define NRF_CSENSE_ENABLED 0
-#endif
-// <o> NRF_CSENSE_PAD_HYSTERESIS - Minimum value of change required to determine that a pad was touched. 
-#ifndef NRF_CSENSE_PAD_HYSTERESIS
-#define NRF_CSENSE_PAD_HYSTERESIS 15
-#endif
-
-// <o> NRF_CSENSE_PAD_DEVIATION - Minimum value measured on a pad required to take it into account while calculating the step. 
-#ifndef NRF_CSENSE_PAD_DEVIATION
-#define NRF_CSENSE_PAD_DEVIATION 70
-#endif
-
-// <o> NRF_CSENSE_MIN_PAD_VALUE - Minimum normalized value on a pad required to take its value into account. 
-#ifndef NRF_CSENSE_MIN_PAD_VALUE
-#define NRF_CSENSE_MIN_PAD_VALUE 20
-#endif
-
-// <o> NRF_CSENSE_MAX_PADS_NUMBER - Maximum number of pads used for one instance. 
-#ifndef NRF_CSENSE_MAX_PADS_NUMBER
-#define NRF_CSENSE_MAX_PADS_NUMBER 20
-#endif
-
-// <o> NRF_CSENSE_MAX_VALUE - Maximum normalized value obtained from measurement. 
-#ifndef NRF_CSENSE_MAX_VALUE
-#define NRF_CSENSE_MAX_VALUE 1000
-#endif
-
-// <o> NRF_CSENSE_OUTPUT_PIN - Output pin used by the low-level module. 
-// <i> This is used when capacitive sensor does not use COMP.
-
-#ifndef NRF_CSENSE_OUTPUT_PIN
-#define NRF_CSENSE_OUTPUT_PIN 26
-#endif
-
-// </e>
-
-// <e> NRF_DRV_CSENSE_ENABLED - nrf_drv_csense - Capacitive sensor low-level module
-//==========================================================
-#ifndef NRF_DRV_CSENSE_ENABLED
-#define NRF_DRV_CSENSE_ENABLED 0
-#endif
-// <e> USE_COMP - Use the comparator to implement the capacitive sensor driver.
-
-// <i> Due to Anomaly 84, COMP I_SOURCE is not functional. It has too high a varation.
-//==========================================================
-#ifndef USE_COMP
-#define USE_COMP 0
-#endif
-// <o> TIMER0_FOR_CSENSE - First TIMER instance used by the driver (not used on nRF51). 
-#ifndef TIMER0_FOR_CSENSE
-#define TIMER0_FOR_CSENSE 1
-#endif
-
-// <o> TIMER1_FOR_CSENSE - Second TIMER instance used by the driver (not used on nRF51). 
-#ifndef TIMER1_FOR_CSENSE
-#define TIMER1_FOR_CSENSE 2
-#endif
-
-// <o> MEASUREMENT_PERIOD - Single measurement period. 
-// <i> Time of a single measurement can be calculated as
-// <i> T = (1/2)*MEASUREMENT_PERIOD*(1/f_OSC) where f_OSC = I_SOURCE / (2C*(VUP-VDOWN) ).
-// <i> I_SOURCE, VUP, and VDOWN are values used to initialize COMP and C is the capacitance of the used pad.
-
-#ifndef MEASUREMENT_PERIOD
-#define MEASUREMENT_PERIOD 20
-#endif
-
-// </e>
-
-// </e>
-
 // <q> NRF_FPRINTF_ENABLED  - nrf_fprintf - fprintf function.
  
 
 #ifndef NRF_FPRINTF_ENABLED
 #define NRF_FPRINTF_ENABLED 1
-#endif
-
-// <e> NRF_FSTORAGE_ENABLED - nrf_fstorage - Flash abstraction library
-//==========================================================
-#ifndef NRF_FSTORAGE_ENABLED
-#define NRF_FSTORAGE_ENABLED 0
-#endif
-// <h> nrf_fstorage - Common settings
-
-// <i> Common settings to all fstorage implementations
-//==========================================================
-// <q> NRF_FSTORAGE_PARAM_CHECK_DISABLED  - Disable user input validation
- 
-
-// <i> If selected, use ASSERT to validate user input.
-// <i> This effectively removes user input validation in production code.
-// <i> Recommended setting: OFF, only enable this setting if size is a major concern.
-
-#ifndef NRF_FSTORAGE_PARAM_CHECK_DISABLED
-#define NRF_FSTORAGE_PARAM_CHECK_DISABLED 0
-#endif
-
-// </h> 
-//==========================================================
-
-// <h> nrf_fstorage_sd - Implementation using the SoftDevice
-
-// <i> Configuration options for the fstorage implementation using the SoftDevice
-//==========================================================
-// <o> NRF_FSTORAGE_SD_QUEUE_SIZE - Size of the internal queue of operations 
-// <i> Increase this value if API calls frequently return the error @ref NRF_ERROR_NO_MEM.
-
-#ifndef NRF_FSTORAGE_SD_QUEUE_SIZE
-#define NRF_FSTORAGE_SD_QUEUE_SIZE 4
-#endif
-
-// <o> NRF_FSTORAGE_SD_MAX_RETRIES - Maximum number of attempts at executing an operation when the SoftDevice is busy 
-// <i> Increase this value if events frequently return the @ref NRF_ERROR_TIMEOUT error.
-// <i> The SoftDevice might fail to schedule flash access due to high BLE activity.
-
-#ifndef NRF_FSTORAGE_SD_MAX_RETRIES
-#define NRF_FSTORAGE_SD_MAX_RETRIES 8
-#endif
-
-// <o> NRF_FSTORAGE_SD_MAX_WRITE_SIZE - Maximum number of bytes to be written to flash in a single operation 
-// <i> This value must be a multiple of four.
-// <i> Lowering this value can increase the chances of the SoftDevice being able to execute flash operations in between radio activity.
-// <i> This value is bound by the maximum number of bytes that can be written to flash in a single call to @ref sd_flash_write.
-// <i> That is 1024 bytes for nRF51 ICs and 4096 bytes for nRF52 ICs.
-
-#ifndef NRF_FSTORAGE_SD_MAX_WRITE_SIZE
-#define NRF_FSTORAGE_SD_MAX_WRITE_SIZE 4096
-#endif
-
-// </h> 
-//==========================================================
-
-// </e>
-
-// <q> NRF_GFX_ENABLED  - nrf_gfx - GFX module
- 
-
-#ifndef NRF_GFX_ENABLED
-#define NRF_GFX_ENABLED 0
 #endif
 
 // <q> NRF_MEMOBJ_ENABLED  - nrf_memobj - Linked memory allocator module
@@ -5357,7 +5043,7 @@
  
 
 #ifndef NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED
-#define NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED 0
+#define NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED 1
 #endif
 
 // <q> NRF_PWR_MGMT_CONFIG_AUTO_SHUTDOWN_RETRY  - Blocked shutdown procedure will be retried every second.
@@ -5386,7 +5072,7 @@
 // <e> NRF_QUEUE_ENABLED - nrf_queue - Queue module
 //==========================================================
 #ifndef NRF_QUEUE_ENABLED
-#define NRF_QUEUE_ENABLED 0
+#define NRF_QUEUE_ENABLED 1
 #endif
 // <q> NRF_QUEUE_CLI_CMDS  - Enable CLI commands specific to the module
  
