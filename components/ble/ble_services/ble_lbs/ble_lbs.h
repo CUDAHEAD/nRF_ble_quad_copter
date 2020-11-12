@@ -94,6 +94,7 @@ NRF_SDH_BLE_OBSERVER(_name ## _obs,                                             
 #define LBS_UUID_SERVICE     0x1523
 #define LBS_UUID_BUTTON_CHAR 0x1524
 #define LBS_UUID_LED_CHAR    0x1525
+#define LBS_UUID_DATA_CHAR   0x1526
 
 
 // Forward declaration of the ble_lbs_t type.

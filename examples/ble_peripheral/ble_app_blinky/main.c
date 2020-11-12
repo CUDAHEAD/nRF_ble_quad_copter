@@ -72,6 +72,24 @@
 #include "nrf_drv_pwm.h"
 #include "nrfx_pwm.h"
 #include "nrf_pwm.h"
+//#include "nrf_drv_twi.h"
+#include "nrf_twi_mngr.h"
+#include "mma7660.h"
+
+/* TWI instance ID. */
+#if TWI0_ENABLED
+#define TWI_INSTANCE_ID     0
+#elif TWI1_ENABLED
+#define TWI_INSTANCE_ID     1
+#endif
+
+ /* Number of possible TWI addresses. */
+ #define TWI_ADDRESSES      127
+#define TWI_INSTANCE_ID             0
+
+#define MAX_PENDING_TRANSACTIONS    5
+
+
 
 #define ADVERTISING_LED                 BSP_BOARD_LED_0                         /**< Is on when device is advertising. */
 #define CONNECTED_LED                   BSP_BOARD_LED_1                         /**< Is on when device has connected. */
@@ -114,6 +132,12 @@ static nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
 static uint16_t 				   m_pwm_value = 0x2600 ; 
 
 static uint8_t m_used = 0;
+
+/* TWI instance. */
+// static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
+NRF_TWI_MNGR_DEF(m_nrf_twi_mngr, MAX_PENDING_TRANSACTIONS, TWI_INSTANCE_ID);
+
+
 #define USED_PWM(idx) (1UL << idx)
 
 /**@brief Struct that contains pointers to the encoded advertising data. */
@@ -662,11 +686,89 @@ static void demo1(void)
                                       NRF_DRV_PWM_FLAG_LOOP);
 }
 
+/**
+ * @brief TWI initialization.
+ */
+// void twi_init (void)
+// {
+//     ret_code_t err_code;
+
+//     const nrf_drv_twi_config_t twi_config = {
+//        .scl                = ARDUINO_SCL_PIN,
+//        .sda                = ARDUINO_SDA_PIN,
+//        .frequency          = NRF_DRV_TWI_FREQ_100K,
+//        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
+//        .clear_bus_init     = false
+//     };
+
+//     err_code = nrf_drv_twi_init(&m_twi, &twi_config, NULL, NULL);
+//     APP_ERROR_CHECK(err_code);
+
+//     nrf_drv_twi_enable(&m_twi);
+// }
+
+// TWI (with transaction manager) initialization.
+static void twi_config(void)
+{
+    uint32_t err_code;
+
+    nrf_drv_twi_config_t const config = {
+       .scl                = ARDUINO_SCL_PIN,
+       .sda                = ARDUINO_SDA_PIN,
+       .frequency          = NRF_DRV_TWI_FREQ_100K,
+       .interrupt_priority = APP_IRQ_PRIORITY_LOWEST,
+       .clear_bus_init     = false
+    };
+
+    err_code = nrf_twi_mngr_init(&m_nrf_twi_mngr, &config);
+    APP_ERROR_CHECK(err_code);
+
+}
+
+// Buffer for data read from sensors.
+#define BUFFER_SIZE  11
+static uint8_t m_buffer[BUFFER_SIZE];
+
+static void read_mma7660_registers_cb(ret_code_t result, void * p_user_data)
+{
+    if (result != NRF_SUCCESS)
+    {
+        NRF_LOG_WARNING("read_mma7660_registers_cb - error: %d", (int)result);
+        return;
+    }
+
+    NRF_LOG_DEBUG("MMA7660:");
+    NRF_LOG_HEXDUMP_DEBUG(m_buffer, MMA7660_NUMBER_OF_REGISTERS);
+}
+static void read_mma7660_registers(void)
+{
+    // [these structures have to be "static" - they cannot be placed on stack
+    //  since the transaction is scheduled and these structures most likely
+    //  will be referred after this function returns]
+    static nrf_twi_mngr_transfer_t const transfers[] =
+    {
+        MMA7660_READ(&mma7660_xout_reg_addr,
+            m_buffer, MMA7660_NUMBER_OF_REGISTERS)
+    };
+    static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
+    {
+        .callback            = read_mma7660_registers_cb,
+        .p_user_data         = NULL,
+        .p_transfers         = transfers,
+        .number_of_transfers = sizeof(transfers) / sizeof(transfers[0])
+    };
+
+    APP_ERROR_CHECK(nrf_twi_mngr_schedule(&m_nrf_twi_mngr, &transaction));
+}
+
 /**@brief Function for application main entry.
  */
 int main(void)
 {
+
     // Initialize.
+    // twi_init();
+    twi_config();
     log_init();
     leds_init();
     timers_init();
@@ -685,10 +787,28 @@ int main(void)
 
 	demo1();
 
+    read_mma7660_registers();
+
+
     // Enter main loop.
     for (;;)
     {
         idle_state_handle();
+
+        read_mma7660_registers();
+
+        // ret_code_t nrf_drv_twi_tx(nrf_drv_twi_t const * p_instance,
+        //                   uint8_t               address,
+        //                   uint8_t const *       p_data,
+        //                   uint8_t               length,
+        //                   bool                  no_stop);
+
+        // uint8_t sample_data;
+
+        // nrf_drv_twi_tx(&m_twi, 0x1d, &sample_data ,1 , 0);
+                         
+
+
     }
 }
 
