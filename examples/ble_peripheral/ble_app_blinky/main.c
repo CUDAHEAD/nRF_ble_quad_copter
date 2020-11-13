@@ -693,26 +693,6 @@ static void demo1(void)
                                       NRF_DRV_PWM_FLAG_LOOP);
 }
 
-/**
- * @brief TWI initialization.
- */
-// void twi_init (void)
-// {
-//     ret_code_t err_code;
-
-//     const nrf_drv_twi_config_t twi_config = {
-//        .scl                = ARDUINO_SCL_PIN,
-//        .sda                = ARDUINO_SDA_PIN,
-//        .frequency          = NRF_DRV_TWI_FREQ_100K,
-//        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
-//        .clear_bus_init     = false
-//     };
-
-//     err_code = nrf_drv_twi_init(&m_twi, &twi_config, NULL, NULL);
-//     APP_ERROR_CHECK(err_code);
-
-//     nrf_drv_twi_enable(&m_twi);
-// }
 
 // TWI (with transaction manager) initialization.
 static void twi_config(void)
@@ -794,10 +774,8 @@ int main(void)
 
 	demo1();
 
-    NRF_LOG_INFO("About to read regs.");
-
-    read_mma7660_registers();
-    NRF_LOG_INFO("after to read regs.");
+    APP_ERROR_CHECK(nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, mma7660_init_transfers,
+        MMA7660_INIT_TRANSFER_COUNT, NULL));
 
 
 

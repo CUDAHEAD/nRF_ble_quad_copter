@@ -53,19 +53,19 @@ extern "C" {
 // address without this bit, hence shifting.
 #define MMA7660_ADDR        (0x1d)
 
-#define MMA7660_REG_XOUT    0x0d;//0x00
-#define MMA7660_REG_YOUT    0x01
-#define MMA7660_REG_ZOUT    0x02
+#define MMA7660_REG_XOUT    0x06;//0x00
+#define MMA7660_REG_YOUT    0x07
+#define MMA7660_REG_ZOUT    0x08
 #define MMA7660_REG_TILT    0x03
 #define MMA7660_REG_SRST    0x04
 #define MMA7660_REG_SPCNT   0x05
 #define MMA7660_REG_INTSU   0x06
-#define MMA7660_REG_MODE    0x07
+#define MMA7660_REG_MODE    0x16
 #define MMA7660_REG_SR      0x08
 #define MMA7660_REG_PDET    0x09
 #define MMA7660_REG_PD      0x0A
 
-#define MMA7660_NUMBER_OF_REGISTERS 11
+#define MMA7660_NUMBER_OF_REGISTERS 3
 
 // The Alert bit (6) set signals that the register must be read again, since
 // its value may be inaccurate (it was read at the same time as the device was
