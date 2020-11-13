@@ -644,7 +644,7 @@ static void demo1_handler(nrf_drv_pwm_evt_type_t event_type)
         //p_channels[channel] = value;
         //p_channels[channel] = 0x2600; //weak light
         p_channels[channel] = m_pwm_value;
-
+        read_mma7660_registers();
         /*if (next_phase)
         {
             if (++m_demo1_phase >= 2 * NRF_PWM_CHANNEL_COUNT)
@@ -724,7 +724,7 @@ static void read_mma7660_registers_cb(ret_code_t result, void * p_user_data)
         return;
     }
 
-    NRF_LOG_WARNING("MMA7660:");
+    // NRF_LOG_WARNING("MMA7660:");
     NRF_LOG_HEXDUMP_ERROR(m_buffer, MMA7660_NUMBER_OF_REGISTERS);
 }
 static void read_mma7660_registers(void)
