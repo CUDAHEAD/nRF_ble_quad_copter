@@ -51,9 +51,9 @@ extern "C" {
 // 0x98 is the MMA7660's address in the mbed Application Shield, it contains
 // R/W bit and "nrf_drv_twi" (and consequently "nrf_twi_mngr") requires slave
 // address without this bit, hence shifting.
-#define MMA7660_ADDR        (0x98U >> 1)
+#define MMA7660_ADDR        (0x1d)
 
-#define MMA7660_REG_XOUT    0x00
+#define MMA7660_REG_XOUT    0x0d;//0x00
 #define MMA7660_REG_YOUT    0x01
 #define MMA7660_REG_ZOUT    0x02
 #define MMA7660_REG_TILT    0x03

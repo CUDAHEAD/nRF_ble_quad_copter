@@ -119,6 +119,9 @@
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 
+static void read_mma7660_registers(void);
+
+
 BLE_LBS_DEF(m_lbs);                                                             /**< LED Button Service instance. */
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
@@ -307,12 +310,16 @@ static void led_write_handler(uint16_t conn_handle, ble_lbs_t * p_lbs, uint8_t l
 		m_pwm_value = 0x100;
         bsp_board_led_on(LEDBUTTON_LED);
         NRF_LOG_INFO("Received LED ON!");
+                 read_mma7660_registers();
+
     }
     else
     {
 		m_pwm_value = 0x2600;
         bsp_board_led_off(LEDBUTTON_LED);
         NRF_LOG_INFO("Received LED OFF!");
+         read_mma7660_registers();
+
     }
 }
 
@@ -713,8 +720,8 @@ static void twi_config(void)
     uint32_t err_code;
 
     nrf_drv_twi_config_t const config = {
-       .scl                = ARDUINO_SCL_PIN,
-       .sda                = ARDUINO_SDA_PIN,
+       .scl                = ARDUINO_SDA_PIN,
+       .sda                = ARDUINO_SCL_PIN,
        .frequency          = NRF_DRV_TWI_FREQ_100K,
        .interrupt_priority = APP_IRQ_PRIORITY_LOWEST,
        .clear_bus_init     = false
@@ -737,8 +744,8 @@ static void read_mma7660_registers_cb(ret_code_t result, void * p_user_data)
         return;
     }
 
-    NRF_LOG_DEBUG("MMA7660:");
-    NRF_LOG_HEXDUMP_DEBUG(m_buffer, MMA7660_NUMBER_OF_REGISTERS);
+    NRF_LOG_WARNING("MMA7660:");
+    NRF_LOG_HEXDUMP_ERROR(m_buffer, MMA7660_NUMBER_OF_REGISTERS);
 }
 static void read_mma7660_registers(void)
 {
@@ -765,7 +772,7 @@ static void read_mma7660_registers(void)
  */
 int main(void)
 {
-
+    // uint8_t c = 0;
     // Initialize.
     // twi_init();
     twi_config();
@@ -787,7 +794,11 @@ int main(void)
 
 	demo1();
 
+    NRF_LOG_INFO("About to read regs.");
+
     read_mma7660_registers();
+    NRF_LOG_INFO("after to read regs.");
+
 
 
     // Enter main loop.
@@ -795,20 +806,7 @@ int main(void)
     {
         idle_state_handle();
 
-        read_mma7660_registers();
-
-        // ret_code_t nrf_drv_twi_tx(nrf_drv_twi_t const * p_instance,
-        //                   uint8_t               address,
-        //                   uint8_t const *       p_data,
-        //                   uint8_t               length,
-        //                   bool                  no_stop);
-
-        // uint8_t sample_data;
-
-        // nrf_drv_twi_tx(&m_twi, 0x1d, &sample_data ,1 , 0);
-                         
-
-
+      
     }
 }
 
