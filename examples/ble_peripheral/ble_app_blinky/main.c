@@ -119,7 +119,7 @@
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 
-static void read_mma7660_registers(void);
+static void read_MPU6050_registers(void);
 
 
 BLE_LBS_DEF(m_lbs);                                                             /**< LED Button Service instance. */
@@ -135,6 +135,13 @@ static nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
 static uint16_t 				   m_pwm_value = 0x2600 ; 
 
 static uint8_t m_used = 0;
+
+short accel_x_out;
+short accel_y_out;
+short accel_z_out;
+
+
+
 
 /* TWI instance. */
 // static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
@@ -310,7 +317,7 @@ static void led_write_handler(uint16_t conn_handle, ble_lbs_t * p_lbs, uint8_t l
 		m_pwm_value = 0x100;
         bsp_board_led_on(LEDBUTTON_LED);
         NRF_LOG_INFO("Received LED ON!");
-                 read_mma7660_registers();
+                 read_MPU6050_registers();
 
     }
     else
@@ -318,7 +325,7 @@ static void led_write_handler(uint16_t conn_handle, ble_lbs_t * p_lbs, uint8_t l
 		m_pwm_value = 0x2600;
         bsp_board_led_off(LEDBUTTON_LED);
         NRF_LOG_INFO("Received LED OFF!");
-         read_mma7660_registers();
+         read_MPU6050_registers();
 
     }
 }
@@ -619,39 +626,20 @@ static void demo1_handler(nrf_drv_pwm_evt_type_t event_type)
 {
     if (event_type == NRF_DRV_PWM_EVT_FINISHED)
     {
-        uint8_t channel    = 0;//m_demo1_phase >> 1;
-        //bool    down       = 0;//m_demo1_phase & 1;
-        //bool    next_phase = false;
-
+    
         uint16_t * p_channels = (uint16_t *)&m_demo1_seq_values;
-        //uint16_t value = p_channels[channel];
-        /*if (down)
-        {
-            value -= m_demo1_step;
-            if (value == 0)
-            {
-                next_phase = true;
-            }
-        }
-        else
-        {
-            value += m_demo1_step;
-            if (value >= m_demo1_top)
-            {
-                next_phase = true;
-            }
-        }*/
-        //p_channels[channel] = value;
-        //p_channels[channel] = 0x2600; //weak light
-        p_channels[channel] = m_pwm_value;
-        read_mma7660_registers();
-        /*if (next_phase)
-        {
-            if (++m_demo1_phase >= 2 * NRF_PWM_CHANNEL_COUNT)
-            {
-                m_demo1_phase = 0;
-            }
-        }*/
+        p_channels[0] = (short)(10000-(10000*((float)-accel_y_out/32767)));;
+        p_channels[1] = (short)(10000-(10000*((float)accel_y_out/32767)));//0x2600;//m_pwm_value;
+        p_channels[2] = (short)(10000-(10000*((float)-accel_x_out/32767)));;//m_pwm_value;
+        p_channels[3] = (short)(10000-(10000*((float)accel_x_out/32767)));;//0x2600;//m_pwm_value;
+
+
+
+        NRF_LOG_RAW_INFO("\r\n ch::%05d  x:%05d   "  ,
+                        p_channels[1],accel_x_out);//,(NRF_LOG_FLOAT(z)));
+
+        read_MPU6050_registers();
+    
     }
 }
 
@@ -674,7 +662,10 @@ static void demo1(void)
     {
         .output_pins =
         {
-            BSP_LED_0 | NRF_DRV_PWM_PIN_INVERTED // channel 0
+            BSP_LED_0, 
+            BSP_LED_1,
+            BSP_LED_2,
+            BSP_LED_3
         },
         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
         .base_clock   = NRF_PWM_CLK_1MHz,
@@ -716,30 +707,70 @@ static void twi_config(void)
 #define BUFFER_SIZE  11
 static uint8_t m_buffer[BUFFER_SIZE];
 
-static void read_mma7660_registers_cb(ret_code_t result, void * p_user_data)
+static void read_MPU6050_registers_cb(ret_code_t result, void * p_user_data)
 {
     if (result != NRF_SUCCESS)
     {
-        NRF_LOG_WARNING("read_mma7660_registers_cb - error: %d", (int)result);
+        NRF_LOG_WARNING("read_MPU6050_registers_cb - error: %d", (int)result);
         return;
     }
 
-    // NRF_LOG_WARNING("MMA7660:");
-    NRF_LOG_HEXDUMP_ERROR(m_buffer, MMA7660_NUMBER_OF_REGISTERS);
+    // float x = (float)((int)m_buffer[0] * 256 + m_buffer[1])/16384 ; 
+    // float y = (float)((int)m_buffer[2] * 256 + m_buffer[3])/16384 ; 
+    // float z = (float)((int)m_buffer[4] * 256 + m_buffer[5])/16384 ; 
+
+    accel_x_out = ((short)m_buffer[0] * 256 + m_buffer[1]);
+    accel_y_out = ((short)m_buffer[2] * 256 + m_buffer[3]);
+    accel_z_out = ((short)m_buffer[4] * 256 + m_buffer[5]);
+
+
+    float fx = (float)accel_x_out/16384;
+    float fy = (float)accel_y_out/16384;
+
+
+    //NRF_LOG_RAW_INFO("\r\nx(float): " NRF_LOG_FLOAT_MARKER " X:%05d  Y:%05d Z:%05d  "  ,
+     //                   NRF_LOG_FLOAT(fx),accel_x_out,accel_y_out,accel_z_out);//,(NRF_LOG_FLOAT(z)));
+
+    // NRF_LOG_INFO("X: " NRF_LOG_FLOAT_MARKER " ",
+    //                      NRF_LOG_FLOAT(x));
+
+    // NRF_LOG_INFO("y: " NRF_LOG_FLOAT_MARKER " ",
+    //                      NRF_LOG_FLOAT(y));
+
+    // NRF_LOG_INFO("z: " NRF_LOG_FLOAT_MARKER " ",
+    //                      NRF_LOG_FLOAT(z));
+
+
+         // NRF_LOG_INFO("Throughput: " NRF_LOG_FLOAT_MARKER " Kbps.",
+         //                 NRF_LOG_FLOAT(throughput_kbps));
+
+    // NRF_LOG_RAW_INFO("Pos " NRF_LOG_FLOAT_MARKER " | X: %3d, Y: %3d, Z: %3d ",
+    //         NRF_LOG_FLOAT((float)x),
+    //         NRF_LOG_FLOAT((float)y),
+    //         NRF_LOG_FLOAT((float)z));
+
+
+      // NRF_LOG_RAW_INFO("Temp: " NRF_LOG_FLOAT_MARKER " | X: %3d, Y: %3d, Z: %3d ",
+      //       NRF_LOG_FLOAT((float)((m_sum.temp * 0.125) / NUMBER_OF_SAMPLES)),
+      //       m_sum.x / NUMBER_OF_SAMPLES,
+      //       m_sum.y / NUMBER_OF_SAMPLES,
+      //       m_sum.z / NUMBER_OF_SAMPLES);
+    //NRF_LOG_WARNING("MPU6050 data:");
+    // NRF_LOG_HEXDUMP_ERROR(m_buffer, MPU6050_NUMBER_OF_REGISTERS);
 }
-static void read_mma7660_registers(void)
+static void read_MPU6050_registers(void)
 {
     // [these structures have to be "static" - they cannot be placed on stack
     //  since the transaction is scheduled and these structures most likely
     //  will be referred after this function returns]
     static nrf_twi_mngr_transfer_t const transfers[] =
     {
-        MMA7660_READ(&mma7660_xout_reg_addr,
-            m_buffer, MMA7660_NUMBER_OF_REGISTERS)
+        MPU6050_READ(&MPU6050_xout_reg_addr,
+            m_buffer, MPU6050_NUMBER_OF_REGISTERS)
     };
     static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
     {
-        .callback            = read_mma7660_registers_cb,
+        .callback            = read_MPU6050_registers_cb,
         .p_user_data         = NULL,
         .p_transfers         = transfers,
         .number_of_transfers = sizeof(transfers) / sizeof(transfers[0])
@@ -774,8 +805,8 @@ int main(void)
 
 	demo1();
 
-    APP_ERROR_CHECK(nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, mma7660_init_transfers,
-        MMA7660_INIT_TRANSFER_COUNT, NULL));
+    APP_ERROR_CHECK(nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, MPU6050_init_transfers,
+        MPU6050_INIT_TRANSFER_COUNT, NULL));
 
 
 
