@@ -622,7 +622,7 @@ static nrf_pwm_sequence_t const    m_demo1_seq =
 };
 
 
-static void demo1_handler(nrf_drv_pwm_evt_type_t event_type)
+static void pwm_handler(nrf_drv_pwm_evt_type_t event_type)
 {
     if (event_type == NRF_DRV_PWM_EVT_FINISHED)
     {
@@ -635,8 +635,7 @@ static void demo1_handler(nrf_drv_pwm_evt_type_t event_type)
 
 
 
-        NRF_LOG_RAW_INFO("\r\n ch::%05d  x:%05d   "  ,
-                        p_channels[1],accel_x_out);//,(NRF_LOG_FLOAT(z)));
+        // NRF_LOG_RAW_INFO("\r\n ch::%05d  x:%05d   "  , p_channels[1],accel_x_out);//,(NRF_LOG_FLOAT(z)));
 
         read_MPU6050_registers();
     
@@ -645,18 +644,9 @@ static void demo1_handler(nrf_drv_pwm_evt_type_t event_type)
 
 
 
-static void demo1(void)
+static void pwm_module_init(void)
 {
-    NRF_LOG_INFO("Demo 1");
-
-    /*
-     * This demo plays back a sequence with different values for individual
-     * channels (LED 1 - LED 4). Only four values are used (one per channel).
-     * Every time the values are loaded into the compare registers, they are
-     * updated in the provided event handler. The values are updated in such
-     * a way that increase and decrease of the light intensity can be observed
-     * continuously on succeeding channels (one second per channel).
-     */
+    NRF_LOG_INFO("PWM control module init ");
 
     nrf_drv_pwm_config_t const config0 =
     {
@@ -674,7 +664,7 @@ static void demo1(void)
         .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
         .step_mode    = NRF_PWM_STEP_AUTO
     };
-    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, demo1_handler));
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, pwm_handler));
     m_used |= USED_PWM(0);
 
     m_demo1_seq_values.channel_0 = 0;
@@ -704,8 +694,8 @@ static void twi_config(void)
 }
 
 // Buffer for data read from sensors.
-#define BUFFER_SIZE  11
-static uint8_t m_buffer[BUFFER_SIZE];
+// #define BUFFER_SIZE  14
+static uint8_t m_buffer[MPU6050_NUMBER_OF_REGISTERS];
 
 static void read_MPU6050_registers_cb(ret_code_t result, void * p_user_data)
 {
@@ -715,18 +705,24 @@ static void read_MPU6050_registers_cb(ret_code_t result, void * p_user_data)
         return;
     }
 
-    // float x = (float)((int)m_buffer[0] * 256 + m_buffer[1])/16384 ; 
-    // float y = (float)((int)m_buffer[2] * 256 + m_buffer[3])/16384 ; 
-    // float z = (float)((int)m_buffer[4] * 256 + m_buffer[5])/16384 ; 
-
+ 
     accel_x_out = ((short)m_buffer[0] * 256 + m_buffer[1]);
     accel_y_out = ((short)m_buffer[2] * 256 + m_buffer[3]);
     accel_z_out = ((short)m_buffer[4] * 256 + m_buffer[5]);
 
 
+    // NRF_LOG_INFO("accel: X: %d Y: %d Z: %d", accel_x_out, accel_y_out, accel_z_out);
+
     float fx = (float)accel_x_out/16384;
     float fy = (float)accel_y_out/16384;
 
+
+    short gyro_x_out = ((short)m_buffer[8] * 256 + m_buffer[9]);
+    short gyro_y_out = ((short)m_buffer[10] * 256 + m_buffer[11]);
+    short gyro_z_out = ((short)m_buffer[12] * 256 + m_buffer[13]);
+
+
+    NRF_LOG_INFO("accel: X: %+.5d Y: %+.5d Z: %+.5d     |  gyro: X: %+.5d Y: %+.5d Z: %+.5d", accel_x_out, accel_y_out, accel_z_out,gyro_x_out, gyro_y_out, gyro_z_out);
 
     //NRF_LOG_RAW_INFO("\r\nx(float): " NRF_LOG_FLOAT_MARKER " X:%05d  Y:%05d Z:%05d  "  ,
      //                   NRF_LOG_FLOAT(fx),accel_x_out,accel_y_out,accel_z_out);//,(NRF_LOG_FLOAT(z)));
@@ -767,6 +763,8 @@ static void read_MPU6050_registers(void)
     {
         MPU6050_READ(&MPU6050_xout_reg_addr,
             m_buffer, MPU6050_NUMBER_OF_REGISTERS)
+
+
     };
     static nrf_twi_mngr_transaction_t NRF_TWI_MNGR_BUFFER_LOC_IND transaction =
     {
@@ -803,7 +801,7 @@ int main(void)
     NRF_LOG_INFO("Blinky example started.");
     advertising_start();
 
-	demo1();
+	pwm_module_init();
 
     APP_ERROR_CHECK(nrf_twi_mngr_perform(&m_nrf_twi_mngr, NULL, MPU6050_init_transfers,
         MPU6050_INIT_TRANSFER_COUNT, NULL));

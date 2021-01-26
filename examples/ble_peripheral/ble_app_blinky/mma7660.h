@@ -14,25 +14,25 @@ extern "C" {
 // address without this bit, hence shifting.
 #define MPU6050_ADDR        (0x68)
 
-#define MPU6050_REG_XOUT    0x3B //0x75 - Who am i//0x3B;//0x00
-#define MPU6050_REG_YOUT    0x61
-#define MPU6050_REG_ZOUT    0x63
+#define MPU6050_REG_XOUT    0x3b//0x43//0x3B //0x75 - Who am i//0x3B;//0x00
+// #define MPU6050_REG_YOUT    0x61
+// #define MPU6050_REG_ZOUT    0x63
 // #define MPU6050_REG_TILT    0x03
 // #define MPU6050_REG_SRST    0x04
 // #define MPU6050_REG_SPCNT   0x05
 // #define MPU6050_REG_INTSU   0x06
-#define MPU6050_REG_MODE    0x1B
+// #define MPU6050_REG_MODE    0x1B
 // #define MPU6050_REG_SR      0x08
 // #define MPU6050_REG_PDET    0x09
 // #define MPU6050_REG_PD      0x0A
 
-#define MPU6050_NUMBER_OF_REGISTERS 6
+#define MPU6050_NUMBER_OF_REGISTERS 14
 
 // The Alert bit (6) set signals that the register must be read again, since
 // its value may be inaccurate (it was read at the same time as the device was
 // attempting to update it).
 // Applies to XOUT, YOUT, ZOUT and TILT registers.
-#define MPU6050_DATA_IS_VALID(reg_data)  (!((reg_data) & (1U << 6)))
+// #define MPU6050_DATA_IS_VALID(reg_data)  (!((reg_data) & (1U << 6)))
 
 // Gets acceleration (g) value (6-bit 2's complement) from register data.
 // [use "/ 4" instead of ">> 2", as the result of right-shifting of a signed
@@ -56,10 +56,11 @@ extern uint8_t NRF_TWI_MNGR_BUFFER_LOC_IND MPU6050_xout_reg_addr;
     NRF_TWI_MNGR_READ (MPU6050_ADDR, p_buffer,   byte_cnt, 0)
 
 //TODO should convert to 16 bit
-#define MPU6050_READ_XYZ_AND_TILT(p_buffer) \
-    MPU6050_READ(&MPU6050_xout_reg_addr, p_buffer, MPU6050_NUMBER_OF_REGISTERS)
+// #define MPU6050_READ_XYZ_AND_TILT(p_buffer) \
+//     MPU6050_READ(&MPU6050_xout_reg_addr, p_buffer, MPU6050_NUMBER_OF_REGISTERS)
 
-#define MPU6050_INIT_TRANSFER_COUNT 2
+
+#define MPU6050_INIT_TRANSFER_COUNT 3
 
 extern nrf_twi_mngr_transfer_t const
     MPU6050_init_transfers[MPU6050_INIT_TRANSFER_COUNT];
