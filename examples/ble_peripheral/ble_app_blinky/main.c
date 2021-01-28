@@ -312,22 +312,36 @@ static void nrf_qwr_error_handler(uint32_t nrf_error)
  */
 static void led_write_handler(uint16_t conn_handle, ble_lbs_t * p_lbs, uint8_t led_state)
 {
-    if (led_state)
-    {
-		m_pwm_value = 0x100;
-        bsp_board_led_on(LEDBUTTON_LED);
-        NRF_LOG_INFO("Received LED ON!");
-                 read_MPU6050_registers();
+    // if ((int)m_pwm_value - 10 * ((int)led_state - 128) <= 0)
+    //     return ;
 
-    }
-    else
-    {
-		m_pwm_value = 0x2600;
-        bsp_board_led_off(LEDBUTTON_LED);
-        NRF_LOG_INFO("Received LED OFF!");
-         read_MPU6050_registers();
+    m_pwm_value -= 30* ((int8_t)led_state);
 
+    // limit values.
+
+    if (m_pwm_value > 50000) {
+        m_pwm_value = 0;
+    } else if (m_pwm_value > 10000 ) {
+        m_pwm_value = 10000 ;
     }
+    NRF_LOG_INFO("NEW pwm value %d\n", m_pwm_value);
+
+  //   if (led_state)
+  //   {
+		// m_pwm_value = 0x100;
+  //       bsp_board_led_on(LEDBUTTON_LED);
+  //       NRF_LOG_INFO("Received LED ON!");
+  //                read_MPU6050_registers();
+
+  //   }
+  //   else
+  //   {
+		// m_pwm_value = 0x2600;
+  //       bsp_board_led_off(LEDBUTTON_LED);
+  //       NRF_LOG_INFO("Received LED OFF!");
+  //        read_MPU6050_registers();
+
+  //   }
 }
 
 
@@ -628,10 +642,17 @@ static void pwm_handler(nrf_drv_pwm_evt_type_t event_type)
     {
     
         uint16_t * p_channels = (uint16_t *)&m_demo1_seq_values;
-        p_channels[0] = (short)(10000-(10000*((float)-accel_y_out/32767)));;
-        p_channels[1] = (short)(10000-(10000*((float)accel_y_out/32767)));//0x2600;//m_pwm_value;
-        p_channels[2] = (short)(10000-(10000*((float)-accel_x_out/32767)));;//m_pwm_value;
-        p_channels[3] = (short)(10000-(10000*((float)accel_x_out/32767)));;//0x2600;//m_pwm_value;
+        // p_channels[0] = (short)(10000-(10000*((float)-accel_y_out/4096)));;
+        // p_channels[1] = (short)(10000-(10000*((float)accel_y_out/4096)));//0x2600;//m_pwm_value;
+        // p_channels[2] = (short)(10000-(10000*((float)-accel_x_out/4096)));;//m_pwm_value;
+        // p_channels[3] = (short)(10000-(10000*((float)accel_x_out/4096)));;//0x2600;//m_pwm_value;
+        
+        p_channels[0] = (short)(m_pwm_value-(10000*((float)-accel_y_out/4096)));;
+        p_channels[1] = (short)(m_pwm_value-(10000*((float)accel_y_out/4096)));//0x2600;//m_pwm_value;
+        p_channels[2] = (short)(m_pwm_value-(10000*((float)-accel_x_out/4096)));;//m_pwm_value;
+        p_channels[3] = (short)(m_pwm_value-(10000*((float)accel_x_out/4096)));;//0x2600;//m_pwm_value;
+
+
 
 
 
@@ -722,7 +743,7 @@ static void read_MPU6050_registers_cb(ret_code_t result, void * p_user_data)
     short gyro_z_out = ((short)m_buffer[12] * 256 + m_buffer[13]);
 
 
-    NRF_LOG_INFO("accel: X: %+.5d Y: %+.5d Z: %+.5d     |  gyro: X: %+.5d Y: %+.5d Z: %+.5d", accel_x_out, accel_y_out, accel_z_out,gyro_x_out, gyro_y_out, gyro_z_out);
+    // NRF_LOG_INFO("accel: X: %+.5d Y: %+.5d Z: %+.5d     |  gyro: X: %+.5d Y: %+.5d Z: %+.5d", accel_x_out, accel_y_out, accel_z_out,gyro_x_out, gyro_y_out, gyro_z_out);
 
     //NRF_LOG_RAW_INFO("\r\nx(float): " NRF_LOG_FLOAT_MARKER " X:%05d  Y:%05d Z:%05d  "  ,
      //                   NRF_LOG_FLOAT(fx),accel_x_out,accel_y_out,accel_z_out);//,(NRF_LOG_FLOAT(z)));
